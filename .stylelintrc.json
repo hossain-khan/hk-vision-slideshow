@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "color-no-invalid-hex": true,
+    "unit-no-unknown": true,
+    "property-no-unknown": true,
+    "function-no-unknown": true,
+    "selector-type-no-unknown": true,
+    "declaration-block-no-duplicate-properties": true,
+    "no-duplicate-selectors": true,
+    "no-duplicate-at-import-rules": true
+  }
+}
