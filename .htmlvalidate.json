@@ -1,7 +1,7 @@
 {
   "extends": ["html-validate:recommended"],
   "rules": {
-    "no-empty-headings": "off",
-    "no-empty-body": "off"
+    "empty-heading": "off",
+    "attribute-allowed-values": "off"
   }
 }

@@ -13,9 +13,9 @@
   </header>
 
   <nav class="section-nav">
-    <button class="tab active" data-section="featured">Featured</button>
-    <button class="tab" data-section="blog">Blog</button>
-    <button class="tab" data-section="all">All Photos</button>
+    <button type="button" class="tab active" data-section="featured">Featured</button>
+    <button type="button" class="tab" data-section="blog">Blog</button>
+    <button type="button" class="tab" data-section="all">All Photos</button>
   </nav>
 
   <div id="loading" class="loading-spinner">
@@ -25,20 +25,20 @@
 
   <div id="error" class="error-message" hidden>
     <p>Failed to load photos. Please try again.</p>
-    <button id="retry-btn">Retry</button>
+    <button type="button" id="retry-btn">Retry</button>
   </div>
 
   <div id="slideshow-start-container" class="slideshow-start-container" hidden>
-    <button id="start-slideshow-btn" class="start-slideshow-btn">&#9654; Start Slideshow</button>
-    <button id="start-zen-btn" class="start-zen-btn">Zen View</button>
+    <button type="button" id="start-slideshow-btn" class="start-slideshow-btn">&#9654; Start Slideshow</button>
+    <button type="button" id="start-zen-btn" class="start-zen-btn">Zen View</button>
   </div>
 
   <main id="gallery" class="photo-grid" hidden></main>
 
   <div id="slideshow" class="slideshow-overlay" hidden>
-    <button class="slideshow-close" aria-label="Close">&times;</button>
-    <button class="slideshow-prev" aria-label="Previous">&lsaquo;</button>
-    <button class="slideshow-next" aria-label="Next">&rsaquo;</button>
+    <button type="button" class="slideshow-close" aria-label="Close">&times;</button>
+    <button type="button" class="slideshow-prev" aria-label="Previous">&lsaquo;</button>
+    <button type="button" class="slideshow-next" aria-label="Next">&rsaquo;</button>
     <div class="slideshow-content">
       <img id="slideshow-img" src="" alt="">
       <div class="slideshow-info">
@@ -48,7 +48,7 @@
       </div>
     </div>
     <div class="slideshow-controls">
-      <button id="autoplay-btn">&#9654; Auto</button>
+      <button type="button" id="autoplay-btn">&#9654; Auto</button>
       <span id="slideshow-counter"></span>
       <a id="slideshow-link" href="#" target="_blank" rel="noopener noreferrer">View on site</a>
     </div>
