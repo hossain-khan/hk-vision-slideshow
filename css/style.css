@@ -270,6 +270,8 @@ body {
   opacity: 0.5;
   z-index: 0;
 }
+
+.slideshow-close {
   position: absolute;
   top: 1rem;
   right: 1.25rem;
@@ -401,6 +403,8 @@ body {
   border-color: var(--accent);
   color: var(--accent);
 }
+
+#slideshow-link {
   color: var(--accent);
   text-decoration: none;
   font-size: 0.8rem;
