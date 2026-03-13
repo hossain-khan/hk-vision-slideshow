@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HK Vision - Photography Slideshow</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>HK Vision</h1>
+    <p class="tagline">Photography Portfolio</p>
+  </header>
+
+  <nav class="section-nav">
+    <button class="tab active" data-section="featured">Featured</button>
+    <button class="tab" data-section="blog">Blog</button>
+    <button class="tab" data-section="all">All Photos</button>
+  </nav>
+
+  <div id="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading photos...</p>
+  </div>
+
+  <div id="error" class="error-message" hidden>
+    <p>Failed to load photos. Please try again.</p>
+    <button id="retry-btn">Retry</button>
+  </div>
+
+  <div id="slideshow-start-container" class="slideshow-start-container" hidden>
+    <button id="start-slideshow-btn" class="start-slideshow-btn">Start Slideshow</button>
+  </div>
+
+  <main id="gallery" class="photo-grid" hidden></main>
+
+  <div id="slideshow" class="slideshow-overlay" hidden>
+    <button class="slideshow-close" aria-label="Close">&times;</button>
+    <button class="slideshow-prev" aria-label="Previous">&lsaquo;</button>
+    <button class="slideshow-next" aria-label="Next">&rsaquo;</button>
+    <div class="slideshow-content">
+      <img id="slideshow-img" src="" alt="">
+      <div class="slideshow-info">
+        <h2 id="slideshow-title"></h2>
+        <p id="slideshow-subtitle"></p>
+        <p id="slideshow-date"></p>
+      </div>
+    </div>
+    <div class="slideshow-controls">
+      <button id="autoplay-btn">&#9654; Auto</button>
+      <span id="slideshow-counter"></span>
+      <a id="slideshow-link" href="#" target="_blank" rel="noopener">View on site</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>&copy; Hossain Khan | <a href="https://vision.hossainkhan.com">vision.hossainkhan.com</a></p>
+  </footer>
+
+  <script src="js/app.js" defer></script>
+</body>
+</html>
