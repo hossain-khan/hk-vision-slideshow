@@ -1,5 +1,7 @@
 const API_URL = 'https://vision.hossainkhan.com/photos.json';
 const AUTOPLAY_INTERVAL = 5000;
+const ZEN_INTERVAL = 60000;  // 1 minute per image
+const ZEN_FADE_MS  = 2500;   // must match CSS transition on .zen-img
 
 console.log('[HK Vision] App initializing. API_URL:', API_URL);
 
@@ -12,6 +14,14 @@ const state = {
   autoplayActive: false,
   touchStartX: 0,
   updateTimer: null,  // tracks pending slideshow image-swap timeout
+};
+
+const zenState = {
+  active: false,
+  index: 0,
+  frontIsA: true,  // true = img-a is visible, false = img-b is visible
+  timer: null,
+  hintTimer: null,
 };
 
 // --- Data Fetching ---
@@ -256,6 +266,118 @@ function stopAutoplay() {
   state.autoplayTimer = null;
 }
 
+// --- Zen View ---
+
+function openZen(startIndex) {
+  console.log('[HK Vision] openZen: starting at index', startIndex, 'of', state.currentPhotos.length, 'photos');
+  var zen   = document.getElementById('zen');
+  var imgA  = document.getElementById('zen-img-a');
+  var imgB  = document.getElementById('zen-img-b');
+  var hint  = document.querySelector('.zen-hint');
+
+  zenState.active   = true;
+  zenState.index    = startIndex;
+  zenState.frontIsA = true;
+
+  // Reset both slots
+  imgA.src = '';
+  imgB.src = '';
+  imgA.classList.add('zen-img--active');
+  imgB.classList.remove('zen-img--active');
+
+  zen.hidden = false;
+  document.body.classList.add('slideshow-open');
+  void zen.offsetHeight;  // force reflow before adding visible
+  zen.classList.add('visible');
+
+  // Load first image into slot A
+  var photo = state.currentPhotos[zenState.index];
+  imgA.onload = function() {
+    console.log('[HK Vision] openZen: first image loaded OK -', photo.image_src);
+  };
+  imgA.onerror = function() {
+    console.error('[HK Vision] openZen: first image FAILED to load -', photo.image_src);
+  };
+  imgA.src = photo.image_src;
+  imgA.alt = photo.title;
+  console.log('[HK Vision] openZen: loading first image -', photo.image_src);
+
+  // Show hint then fade it after 3 s
+  hint.classList.remove('fade-out');
+  zenState.hintTimer = setTimeout(function() {
+    hint.classList.add('fade-out');
+    console.log('[HK Vision] openZen: hiding hint');
+  }, 3000);
+
+  // Start advance timer
+  zenState.timer = setInterval(zenAdvance, ZEN_INTERVAL);
+  console.log('[HK Vision] openZen: timer started, ZEN_INTERVAL=' + ZEN_INTERVAL + 'ms, ZEN_FADE_MS=' + ZEN_FADE_MS + 'ms');
+
+  // Preload the next image now so it's ready when the timer fires
+  if (state.currentPhotos.length > 1) {
+    var nextIdx = (zenState.index + 1) % state.currentPhotos.length;
+    var preload = new Image();
+    preload.src = state.currentPhotos[nextIdx].image_src;
+    console.log('[HK Vision] openZen: preloading next image (index ' + nextIdx + ') -', preload.src);
+  }
+}
+
+function zenAdvance() {
+  var len       = state.currentPhotos.length;
+  var nextIndex = (zenState.index + 1) % len;
+  var photo     = state.currentPhotos[nextIndex];
+
+  console.log('[HK Vision] zenAdvance: cross-fading from index', zenState.index, '->', nextIndex, '-', photo.title);
+
+  var imgA     = document.getElementById('zen-img-a');
+  var imgB     = document.getElementById('zen-img-b');
+  var frontImg = zenState.frontIsA ? imgA : imgB;
+  var backImg  = zenState.frontIsA ? imgB : imgA;
+
+  // Load next photo into the back (hidden) slot, then cross-fade on load
+  backImg.onload = function() {
+    console.log('[HK Vision] zenAdvance: next image loaded, triggering cross-fade -', photo.image_src);
+    backImg.classList.add('zen-img--active');    // fade in
+    frontImg.classList.remove('zen-img--active'); // fade out
+    zenState.frontIsA = !zenState.frontIsA;
+    zenState.index    = nextIndex;
+
+    // Preload the one after next while this fade is running
+    var afterNext = (nextIndex + 1) % len;
+    var preload   = new Image();
+    preload.src   = state.currentPhotos[afterNext].image_src;
+    console.log('[HK Vision] zenAdvance: preloading index', afterNext, '-', preload.src);
+  };
+  backImg.onerror = function() {
+    console.error('[HK Vision] zenAdvance: image FAILED to load, advancing index anyway -', photo.image_src);
+    zenState.index = nextIndex;
+  };
+  backImg.src = photo.image_src;
+  backImg.alt = photo.title;
+  console.log('[HK Vision] zenAdvance: loading back-slot image -', photo.image_src);
+}
+
+function closeZen() {
+  console.log('[HK Vision] closeZen');
+  zenState.active = false;
+  clearInterval(zenState.timer);
+  zenState.timer = null;
+  clearTimeout(zenState.hintTimer);
+  zenState.hintTimer = null;
+
+  var zen = document.getElementById('zen');
+  zen.classList.remove('visible');
+  // Wait for overlay fade-out transition before hiding
+  setTimeout(function() {
+    zen.hidden = true;
+    document.getElementById('zen-img-a').src = '';
+    document.getElementById('zen-img-b').src = '';
+    console.log('[HK Vision] closeZen: overlay hidden and image memory freed');
+  }, 650); // slightly longer than CSS 0.6s transition
+
+  document.body.classList.remove('slideshow-open');
+}
+
 // --- Event Listeners (set up after DOM ready via defer) ---
 
 console.log('[HK Vision] Attaching event listeners...');
@@ -276,6 +398,16 @@ document.getElementById('start-slideshow-btn').addEventListener('click', functio
     toggleAutoplay();
   } else {
     console.warn('[HK Vision] start-slideshow-btn: no photos loaded yet');
+  }
+});
+
+// Zen View button
+document.getElementById('start-zen-btn').addEventListener('click', function() {
+  console.log('[HK Vision] start-zen-btn clicked, currentPhotos.length:', state.currentPhotos.length);
+  if (state.currentPhotos.length > 0) {
+    openZen(0);
+  } else {
+    console.warn('[HK Vision] start-zen-btn: no photos loaded yet');
   }
 });
 
@@ -302,6 +434,23 @@ document.getElementById('slideshow').addEventListener('click', function(e) {
 
 // Keyboard
 document.addEventListener('keydown', function(e) {
+  // Zen view takes priority
+  if (zenState.active) {
+    switch (e.key) {
+      case 'Escape':
+        console.log('[HK Vision] keyboard: Escape - closing zen view');
+        closeZen();
+        break;
+      case 'ArrowRight':
+        console.log('[HK Vision] keyboard: ArrowRight - zen skip to next');
+        clearInterval(zenState.timer);
+        zenAdvance();
+        zenState.timer = setInterval(zenAdvance, ZEN_INTERVAL);
+        break;
+    }
+    return;
+  }
+
   if (document.getElementById('slideshow').hidden) return;
   switch (e.key) {
     case 'Escape':
@@ -322,6 +471,12 @@ document.addEventListener('keydown', function(e) {
       toggleAutoplay();
       break;
   }
+});
+
+// Zen overlay: click anywhere to close
+document.getElementById('zen').addEventListener('click', function() {
+  console.log('[HK Vision] zen overlay clicked - closing');
+  closeZen();
 });
 
 // Touch swipe
