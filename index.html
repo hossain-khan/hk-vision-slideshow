@@ -29,7 +29,8 @@
   </div>
 
   <div id="slideshow-start-container" class="slideshow-start-container" hidden>
-    <button id="start-slideshow-btn" class="start-slideshow-btn">Start Slideshow</button>
+    <button id="start-slideshow-btn" class="start-slideshow-btn">&#9654; Start Slideshow</button>
+    <button id="start-zen-btn" class="start-zen-btn">Zen View</button>
   </div>
 
   <main id="gallery" class="photo-grid" hidden></main>
@@ -51,6 +52,13 @@
       <span id="slideshow-counter"></span>
       <a id="slideshow-link" href="#" target="_blank" rel="noopener noreferrer">View on site</a>
     </div>
+  </div>
+
+  <!-- Zen fullscreen view: images only, no chrome -->
+  <div id="zen" class="zen-overlay" hidden>
+    <img id="zen-img-a" class="zen-img zen-img--active" src="" alt="">
+    <img id="zen-img-b" class="zen-img" src="" alt="">
+    <p class="zen-hint">Press <kbd>Esc</kbd> or click anywhere to exit</p>
   </div>
 
   <footer class="site-footer">
