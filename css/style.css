@@ -256,7 +256,20 @@ body {
   pointer-events: auto;
 }
 
-.slideshow-close {
+/* Blurred ambient backdrop — same image scaled to cover + heavy blur fills
+   the letterbox bars left by portrait or narrow photos. z-index 0 keeps it
+   behind all controls and the main image. */
+.slideshow-backdrop {
+  position: absolute;
+  top: -5%;
+  left: -5%;
+  width: 110%;
+  height: 110%;
+  object-fit: cover;
+  filter: blur(35px);
+  opacity: 0.5;
+  z-index: 0;
+}
   position: absolute;
   top: 1rem;
   right: 1.25rem;
@@ -310,6 +323,8 @@ body {
   align-items: center;
   max-width: 90vw;
   max-height: 85vh;
+  position: relative; /* establish stacking context above the backdrop */
+  z-index: 1;
 }
 
 #slideshow-img {
@@ -352,6 +367,7 @@ body {
   gap: 1.5rem;
   font-size: 0.8rem;
   color: var(--text-muted);
+  z-index: 2;
 }
 
 #autoplay-btn {
@@ -370,7 +386,21 @@ body {
   color: var(--accent);
 }
 
-#slideshow-link {
+#fullscreen-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #444;
+  color: var(--text-muted);
+  padding: 0.3rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+#fullscreen-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
   color: var(--accent);
   text-decoration: none;
   font-size: 0.8rem;
@@ -448,6 +478,19 @@ body.slideshow-open {
   pointer-events: auto;
 }
 
+/* Blurred ambient backdrop for zen */
+.zen-backdrop {
+  position: absolute;
+  top: -5%;
+  left: -5%;
+  width: 110%;
+  height: 110%;
+  object-fit: cover;
+  filter: blur(40px);
+  opacity: 0.45;
+  z-index: 0;
+}
+
 /* Two absolutely-stacked images for smooth cross-fading */
 .zen-img {
   position: absolute;
@@ -457,6 +500,7 @@ body.slideshow-open {
   object-fit: contain;
   opacity: 0;
   transition: opacity 2.5s ease-in-out;
+  z-index: 1; /* above backdrop */
 }
 
 .zen-img--active {
@@ -485,4 +529,21 @@ body.slideshow-open {
 
 .zen-hint.fade-out {
   opacity: 0;
+}
+
+.zen-fullscreen-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.55);
+  border-radius: 3px;
+  padding: 0 0.4em;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.zen-fullscreen-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.4);
 }

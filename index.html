@@ -36,6 +36,8 @@
   <main id="gallery" class="photo-grid" hidden></main>
 
   <div id="slideshow" class="slideshow-overlay" hidden>
+    <!-- Same image scaled+blurred fills the letterbox bars ("ambient backdrop") -->
+    <img id="slideshow-backdrop" class="slideshow-backdrop" src="" alt="" aria-hidden="true">
     <button type="button" class="slideshow-close" aria-label="Close">&times;</button>
     <button type="button" class="slideshow-prev" aria-label="Previous">&lsaquo;</button>
     <button type="button" class="slideshow-next" aria-label="Next">&rsaquo;</button>
@@ -49,6 +51,7 @@
     </div>
     <div class="slideshow-controls">
       <button type="button" id="autoplay-btn">&#9654; Auto</button>
+      <button type="button" id="fullscreen-btn" aria-label="Enter fullscreen">&#x26F6; Full</button>
       <span id="slideshow-counter"></span>
       <a id="slideshow-link" href="#" target="_blank" rel="noopener noreferrer">View on site</a>
     </div>
@@ -56,9 +59,10 @@
 
   <!-- Zen fullscreen view: images only, no chrome -->
   <div id="zen" class="zen-overlay" hidden>
+    <img id="zen-backdrop" class="zen-backdrop" src="" alt="" aria-hidden="true">
     <img id="zen-img-a" class="zen-img zen-img--active" src="" alt="">
     <img id="zen-img-b" class="zen-img" src="" alt="">
-    <p class="zen-hint">Press <kbd>Esc</kbd> or click anywhere to exit</p>
+    <p class="zen-hint">Press <kbd>Esc</kbd> or click to exit &nbsp;&middot;&nbsp; <kbd>&#8594;</kbd> skip &nbsp;&middot;&nbsp; <button type="button" id="zen-fullscreen-btn" class="zen-fullscreen-btn">&#x26F6; Full</button></p>
   </div>
 
   <footer class="site-footer">

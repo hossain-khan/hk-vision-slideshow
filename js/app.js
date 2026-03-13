@@ -152,6 +152,10 @@ function closeSlideshow() {
   console.log('[HK Vision] closeSlideshow');
   var slideshow = document.getElementById('slideshow');
   stopAutoplay();
+  if (isFullscreen()) {
+    console.log('[HK Vision] closeSlideshow: also exiting fullscreen');
+    exitFullscreen();
+  }
   slideshow.classList.remove('visible');
   setTimeout(function() {
     slideshow.hidden = true;
@@ -190,6 +194,9 @@ function updateSlideshow() {
   state.updateTimer = setTimeout(function() {
     state.updateTimer = null;
     console.log('[HK Vision] updateSlideshow: setting img.src to', photo.image_src);
+
+    // Sync blurred ambient backdrop
+    document.getElementById('slideshow-backdrop').src = photo.image_src;
 
     img.onload = function() {
       console.log('[HK Vision] slideshow image loaded OK:', photo.image_src);
@@ -266,7 +273,59 @@ function stopAutoplay() {
   state.autoplayTimer = null;
 }
 
-// --- Zen View ---
+// --- Fullscreen ---
+
+function isFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
+function requestFullscreen() {
+  console.log('[HK Vision] requestFullscreen: requesting');
+  var el = document.documentElement;
+  if (el.requestFullscreen) {
+    el.requestFullscreen().catch(function(e) {
+      console.warn('[HK Vision] requestFullscreen failed:', e.message);
+    });
+  } else if (el.webkitRequestFullscreen) {
+    el.webkitRequestFullscreen();
+    console.log('[HK Vision] requestFullscreen: used webkit prefix');
+  } else {
+    console.warn('[HK Vision] requestFullscreen: Fullscreen API not supported in this browser');
+  }
+}
+
+function exitFullscreen() {
+  console.log('[HK Vision] exitFullscreen: exiting');
+  if (document.exitFullscreen) {
+    document.exitFullscreen().catch(function(e) {
+      console.warn('[HK Vision] exitFullscreen failed:', e.message);
+    });
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+}
+
+function toggleFullscreen() {
+  if (isFullscreen()) {
+    exitFullscreen();
+  } else {
+    requestFullscreen();
+  }
+}
+
+function updateFullscreenButtons() {
+  var full   = isFullscreen();
+  var label  = full ? '\u26F6 Exit' : '\u26F6 Full';
+  var btn    = document.getElementById('fullscreen-btn');
+  var zenBtn = document.getElementById('zen-fullscreen-btn');
+  if (btn) {
+    btn.textContent = label;
+    btn.setAttribute('aria-label', full ? 'Exit fullscreen' : 'Enter fullscreen');
+    btn.classList.toggle('active', full);
+  }
+  if (zenBtn) zenBtn.textContent = label;
+  console.log('[HK Vision] fullscreenchange: isFullscreen=' + full);
+}
 
 function openZen(startIndex) {
   console.log('[HK Vision] openZen: starting at index', startIndex, 'of', state.currentPhotos.length, 'photos');
@@ -300,6 +359,7 @@ function openZen(startIndex) {
   };
   imgA.src = photo.image_src;
   imgA.alt = photo.title;
+  document.getElementById('zen-backdrop').src = photo.image_src;
   console.log('[HK Vision] openZen: loading first image -', photo.image_src);
 
   // Show hint then fade it after 3 s
@@ -341,6 +401,8 @@ function zenAdvance() {
     frontImg.classList.remove('zen-img--active'); // fade out
     zenState.frontIsA = !zenState.frontIsA;
     zenState.index    = nextIndex;
+    document.getElementById('zen-backdrop').src = photo.image_src;
+    console.log('[HK Vision] zenAdvance: backdrop updated');
 
     // Preload the one after next while this fade is running
     var afterNext = (nextIndex + 1) % len;
@@ -364,6 +426,10 @@ function closeZen() {
   zenState.timer = null;
   clearTimeout(zenState.hintTimer);
   zenState.hintTimer = null;
+  if (isFullscreen()) {
+    console.log('[HK Vision] closeZen: also exiting fullscreen');
+    exitFullscreen();
+  }
 
   var zen = document.getElementById('zen');
   zen.classList.remove('visible');
@@ -372,6 +438,7 @@ function closeZen() {
     zen.hidden = true;
     document.getElementById('zen-img-a').src = '';
     document.getElementById('zen-img-b').src = '';
+    document.getElementById('zen-backdrop').src = '';
     console.log('[HK Vision] closeZen: overlay hidden and image memory freed');
   }, 650); // slightly longer than CSS 0.6s transition
 
@@ -438,14 +505,24 @@ document.addEventListener('keydown', function(e) {
   if (zenState.active) {
     switch (e.key) {
       case 'Escape':
-        console.log('[HK Vision] keyboard: Escape - closing zen view');
-        closeZen();
+        // If we're in fullscreen, browser exits fullscreen on Esc automatically;
+        // don't also close the zen overlay so user can keep watching windowed.
+        if (!isFullscreen()) {
+          console.log('[HK Vision] keyboard: Escape - closing zen view');
+          closeZen();
+        }
         break;
       case 'ArrowRight':
         console.log('[HK Vision] keyboard: ArrowRight - zen skip to next');
         clearInterval(zenState.timer);
         zenAdvance();
         zenState.timer = setInterval(zenAdvance, ZEN_INTERVAL);
+        break;
+      case 'f':
+      case 'F':
+        e.preventDefault();
+        console.log('[HK Vision] keyboard: F - toggle fullscreen (zen)');
+        toggleFullscreen();
         break;
     }
     return;
@@ -454,8 +531,11 @@ document.addEventListener('keydown', function(e) {
   if (document.getElementById('slideshow').hidden) return;
   switch (e.key) {
     case 'Escape':
-      console.log('[HK Vision] keyboard: Escape - closing slideshow');
-      closeSlideshow();
+      // First Esc exits fullscreen (browser handles it); second Esc closes slideshow.
+      if (!isFullscreen()) {
+        console.log('[HK Vision] keyboard: Escape - closing slideshow');
+        closeSlideshow();
+      }
       break;
     case 'ArrowLeft':
       console.log('[HK Vision] keyboard: ArrowLeft');
@@ -470,14 +550,31 @@ document.addEventListener('keydown', function(e) {
       console.log('[HK Vision] keyboard: Space - toggle autoplay');
       toggleAutoplay();
       break;
+    case 'f':
+    case 'F':
+      e.preventDefault();
+      console.log('[HK Vision] keyboard: F - toggle fullscreen');
+      toggleFullscreen();
+      break;
   }
 });
 
-// Zen overlay: click anywhere to close
+// Zen overlay: click anywhere to close (zen-fullscreen-btn stops propagation)
 document.getElementById('zen').addEventListener('click', function() {
   console.log('[HK Vision] zen overlay clicked - closing');
   closeZen();
 });
+
+// Fullscreen buttons
+document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+document.getElementById('zen-fullscreen-btn').addEventListener('click', function(e) {
+  e.stopPropagation(); // prevent click bubbling to zen overlay (which closes zen)
+  toggleFullscreen();
+});
+
+// Update button labels when fullscreen state changes (e.g. browser Esc key)
+document.addEventListener('fullscreenchange', updateFullscreenButtons);
+document.addEventListener('webkitfullscreenchange', updateFullscreenButtons);
 
 // Touch swipe
 document.getElementById('slideshow').addEventListener('touchstart', function(e) {
