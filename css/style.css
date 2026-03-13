@@ -6,6 +6,13 @@
   box-sizing: border-box;
 }
 
+/* Ensure the HTML hidden attribute always hides elements, even when author CSS
+   sets a display value (e.g. display:flex or display:grid), because the UA
+   stylesheet's [hidden]{display:none} has no !important and gets overridden. */
+[hidden] {
+  display: none !important;
+}
+
 :root {
   --bg: #0a0a0a;
   --bg-card: #1a1a1a;
@@ -217,11 +224,13 @@ body {
   align-items: center;
   justify-content: center;
   opacity: 0;
+  pointer-events: none; /* don't intercept clicks while invisible */
   transition: opacity 0.3s;
 }
 
 .slideshow-overlay.visible {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .slideshow-close {
