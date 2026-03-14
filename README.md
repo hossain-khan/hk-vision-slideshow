@@ -1,4 +1,4 @@
-# hk-vision-slideshow
+# H.K. Vision - Slideshow 🖼️
 A simple app to show slide show of HK Vision pictures
 
 > [!TIP]
