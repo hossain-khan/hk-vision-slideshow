@@ -333,6 +333,52 @@ body {
   text-transform: uppercase;
 }
 
+/* Skeleton Loading */
+.photo-card.skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+.photo-card.skeleton img {
+  background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: skeletonPulse var(--duration-slow) ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Slideshow Image Loading */
+.slideshow-content {
+  position: relative;
+}
+
+#slideshow-img.loading {
+  opacity: 0.5;
+}
+
+.slideshow-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(212, 165, 116, 0.3);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin var(--duration-normal) linear infinite;
+  opacity: 0;
+  transition: opacity var(--duration-quick) var(--ease-out-quart);
+  pointer-events: none;
+}
+
+.slideshow-loading.active {
+  opacity: 1;
+}
+
 /* Slideshow Overlay */
 .slideshow-overlay {
   position: fixed;

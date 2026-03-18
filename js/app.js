@@ -101,7 +101,7 @@ function renderGrid(photos) {
 
   photos.forEach(function(photo, i) {
     var card = document.createElement('div');
-    card.className = 'photo-card';
+    card.className = 'photo-card skeleton';
     card.tabIndex = 0;
     card.setAttribute('role', 'button');
     card.setAttribute('aria-label', 'Open ' + photo.title + ' slideshow');
@@ -124,6 +124,17 @@ function renderGrid(photos) {
     img.src = photo.image_src;
     img.alt = photo.title;
     img.loading = 'lazy';
+
+    // Remove skeleton class when image loads
+    img.addEventListener('load', function() {
+      card.classList.remove('skeleton');
+      console.log('[HK Vision] renderGrid: skeleton removed for', photo.title);
+    });
+    
+    // Keep skeleton visible if image fails to load
+    img.addEventListener('error', function() {
+      console.warn('[HK Vision] renderGrid: image failed to load -', photo.image_src);
+    });
 
     var overlay = document.createElement('div');
     overlay.className = 'card-overlay';
@@ -192,6 +203,7 @@ function updateSlideshow() {
   var dateEl = document.getElementById('slideshow-date');
   var counterEl = document.getElementById('slideshow-counter');
   var linkEl = document.getElementById('slideshow-link');
+  var loadingEl = document.querySelector('.slideshow-loading');
 
   // Cancel any pending image-swap from rapid navigation
   if (state.updateTimer !== null) {
@@ -208,16 +220,24 @@ function updateSlideshow() {
     state.updateTimer = null;
     console.log('[HK Vision] updateSlideshow: setting img.src to', photo.raw_src);
 
+    // Show loading indicator
+    img.classList.add('loading');
+    loadingEl.classList.add('active');
+
     // Sync blurred ambient backdrop
     document.getElementById('slideshow-backdrop').src = photo.raw_src;
 
     img.onload = function() {
       console.log('[HK Vision] slideshow image loaded OK:', photo.raw_src);
       img.classList.remove('fading');
+      img.classList.remove('loading');
+      loadingEl.classList.remove('active');
     };
     img.onerror = function() {
       console.error('[HK Vision] slideshow image FAILED to load:', photo.raw_src);
       img.classList.remove('fading'); // un-stick the fade so the UI doesn't freeze
+      img.classList.remove('loading');
+      loadingEl.classList.remove('active');
     };
 
     img.src = photo.raw_src;
