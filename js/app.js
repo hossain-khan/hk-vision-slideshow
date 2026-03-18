@@ -102,9 +102,22 @@ function renderGrid(photos) {
   photos.forEach(function(photo, i) {
     var card = document.createElement('div');
     card.className = 'photo-card';
-    card.addEventListener('click', function() {
-      console.log('[HK Vision] photo card clicked: index', i, '-', photo.title);
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', 'Open ' + photo.title + ' slideshow');
+    
+    var openCard = function() {
+      console.log('[HK Vision] photo card activated: index', i, '-', photo.title);
       openSlideshow(i);
+    };
+    
+    card.addEventListener('click', openCard);
+    card.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        console.log('[HK Vision] photo card keyboard activated: index', i, '-', photo.title, '(key: ' + e.key + ')');
+        openCard();
+      }
     });
 
     var img = document.createElement('img');
