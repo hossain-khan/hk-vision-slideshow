@@ -452,6 +452,43 @@ function zenAdvance() {
   console.log('[HK Vision] zenAdvance: loading back-slot image -', photo.raw_src);
 }
 
+function zenReverse() {
+  var len        = state.currentPhotos.length;
+  var prevIndex  = (zenState.index - 1 + len) % len;
+  var photo      = state.currentPhotos[prevIndex];
+
+  console.log('[HK Vision] zenReverse: cross-fading from index', zenState.index, '->', prevIndex, '-', photo.title);
+
+  var imgA     = document.getElementById('zen-img-a');
+  var imgB     = document.getElementById('zen-img-b');
+  var frontImg = zenState.frontIsA ? imgA : imgB;
+  var backImg  = zenState.frontIsA ? imgB : imgA;
+
+  // Load previous photo into the back (hidden) slot, then cross-fade on load
+  backImg.onload = function() {
+    console.log('[HK Vision] zenReverse: previous image loaded, triggering cross-fade -', photo.raw_src);
+    backImg.classList.add('zen-img--active');    // fade in
+    frontImg.classList.remove('zen-img--active'); // fade out
+    zenState.frontIsA = !zenState.frontIsA;
+    zenState.index    = prevIndex;
+    document.getElementById('zen-backdrop').src = photo.raw_src;
+    console.log('[HK Vision] zenReverse: backdrop updated');
+
+    // Preload the one before previous while this fade is running
+    var beforePrev = (prevIndex - 1 + len) % len;
+    var preload    = new Image();
+    preload.src    = state.currentPhotos[beforePrev].raw_src;
+    console.log('[HK Vision] zenReverse: preloading index', beforePrev, '-', preload.src);
+  };
+  backImg.onerror = function() {
+    console.error('[HK Vision] zenReverse: image FAILED to load, reversing index anyway -', photo.raw_src);
+    zenState.index = prevIndex;
+  };
+  backImg.src = photo.raw_src;
+  backImg.alt = photo.title;
+  console.log('[HK Vision] zenReverse: loading back-slot image -', photo.raw_src);
+}
+
 function closeZen() {
   console.log('[HK Vision] closeZen');
   zenState.active = false;
@@ -544,6 +581,12 @@ document.addEventListener('keydown', function(e) {
           console.log('[HK Vision] keyboard: Escape - closing zen view');
           closeZen();
         }
+        break;
+      case 'ArrowLeft':
+        console.log('[HK Vision] keyboard: ArrowLeft - zen skip to previous');
+        clearInterval(zenState.timer);
+        zenReverse();
+        zenState.timer = setInterval(zenAdvance, ZEN_INTERVAL);
         break;
       case 'ArrowRight':
         console.log('[HK Vision] keyboard: ArrowRight - zen skip to next');
