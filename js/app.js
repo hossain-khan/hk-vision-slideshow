@@ -535,15 +535,15 @@ function closeZen() {
 
 function zenShowButton() {
   var btn = document.getElementById('zen-fullscreen-btn');
-  btn.style.opacity = '1';
-  btn.style.pointerEvents = 'auto';
+  btn.style.setProperty('opacity', '1', 'important');
+  btn.style.setProperty('pointer-events', 'auto', 'important');
   console.log('[HK Vision] zenShowButton: button shown');
 }
 
 function zenHideButton() {
   var btn = document.getElementById('zen-fullscreen-btn');
-  btn.style.opacity = '0';
-  btn.style.pointerEvents = 'none';
+  btn.style.setProperty('opacity', '0', 'important');
+  btn.style.setProperty('pointer-events', 'none', 'important');
   console.log('[HK Vision] zenHideButton: button hidden');
 }
 
