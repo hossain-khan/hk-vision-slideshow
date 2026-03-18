@@ -535,12 +535,16 @@ function closeZen() {
 
 function zenShowButton() {
   var btn = document.getElementById('zen-fullscreen-btn');
-  btn.classList.remove('hidden');
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+  console.log('[HK Vision] zenShowButton: button shown');
 }
 
 function zenHideButton() {
   var btn = document.getElementById('zen-fullscreen-btn');
-  btn.classList.add('hidden');
+  btn.style.opacity = '0';
+  btn.style.pointerEvents = 'none';
+  console.log('[HK Vision] zenHideButton: button hidden');
 }
 
 function zenOnMouseMove() {
