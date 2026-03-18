@@ -171,7 +171,7 @@ function updateSlideshow() {
     return;
   }
 
-  console.log('[HK Vision] updateSlideshow: index', state.slideshowIndex, '-', photo.title, '| src:', photo.image_src);
+  console.log('[HK Vision] updateSlideshow: index', state.slideshowIndex, '-', photo.title, '| src:', photo.raw_src);
 
   var img = document.getElementById('slideshow-img');
   var titleEl = document.getElementById('slideshow-title');
@@ -193,21 +193,21 @@ function updateSlideshow() {
   // they are always in sync with the src being set (fixes cached-image edge cases).
   state.updateTimer = setTimeout(function() {
     state.updateTimer = null;
-    console.log('[HK Vision] updateSlideshow: setting img.src to', photo.image_src);
+    console.log('[HK Vision] updateSlideshow: setting img.src to', photo.raw_src);
 
     // Sync blurred ambient backdrop
-    document.getElementById('slideshow-backdrop').src = photo.image_src;
+    document.getElementById('slideshow-backdrop').src = photo.raw_src;
 
     img.onload = function() {
-      console.log('[HK Vision] slideshow image loaded OK:', photo.image_src);
+      console.log('[HK Vision] slideshow image loaded OK:', photo.raw_src);
       img.classList.remove('fading');
     };
     img.onerror = function() {
-      console.error('[HK Vision] slideshow image FAILED to load:', photo.image_src);
+      console.error('[HK Vision] slideshow image FAILED to load:', photo.raw_src);
       img.classList.remove('fading'); // un-stick the fade so the UI doesn't freeze
     };
 
-    img.src = photo.image_src;
+    img.src = photo.raw_src;
     img.alt = photo.title;
     titleEl.textContent = photo.title;
     subtitleEl.textContent = photo.subtitle;
@@ -243,8 +243,8 @@ function preloadAdjacent() {
   [-1, 1].forEach(function(offset) {
     var idx = (state.slideshowIndex + offset + len) % len;
     var preloadImg = new Image();
-    preloadImg.src = state.currentPhotos[idx].image_src;
-    console.log('[HK Vision] preloadAdjacent: queuing index', idx, '-', state.currentPhotos[idx].image_src);
+    preloadImg.src = state.currentPhotos[idx].raw_src;
+    console.log('[HK Vision] preloadAdjacent: queuing index', idx, '-', state.currentPhotos[idx].raw_src);
   });
 }
 
@@ -352,15 +352,15 @@ function openZen(startIndex) {
   // Load first image into slot A
   var photo = state.currentPhotos[zenState.index];
   imgA.onload = function() {
-    console.log('[HK Vision] openZen: first image loaded OK -', photo.image_src);
+    console.log('[HK Vision] openZen: first image loaded OK -', photo.raw_src);
   };
   imgA.onerror = function() {
-    console.error('[HK Vision] openZen: first image FAILED to load -', photo.image_src);
+    console.error('[HK Vision] openZen: first image FAILED to load -', photo.raw_src);
   };
-  imgA.src = photo.image_src;
+  imgA.src = photo.raw_src;
   imgA.alt = photo.title;
-  document.getElementById('zen-backdrop').src = photo.image_src;
-  console.log('[HK Vision] openZen: loading first image -', photo.image_src);
+  document.getElementById('zen-backdrop').src = photo.raw_src;
+  console.log('[HK Vision] openZen: loading first image -', photo.raw_src);
 
   // Show hint then fade it after 3 s
   hint.classList.remove('fade-out');
@@ -377,7 +377,7 @@ function openZen(startIndex) {
   if (state.currentPhotos.length > 1) {
     var nextIdx = (zenState.index + 1) % state.currentPhotos.length;
     var preload = new Image();
-    preload.src = state.currentPhotos[nextIdx].image_src;
+    preload.src = state.currentPhotos[nextIdx].raw_src;
     console.log('[HK Vision] openZen: preloading next image (index ' + nextIdx + ') -', preload.src);
   }
 }
@@ -396,27 +396,27 @@ function zenAdvance() {
 
   // Load next photo into the back (hidden) slot, then cross-fade on load
   backImg.onload = function() {
-    console.log('[HK Vision] zenAdvance: next image loaded, triggering cross-fade -', photo.image_src);
+    console.log('[HK Vision] zenAdvance: next image loaded, triggering cross-fade -', photo.raw_src);
     backImg.classList.add('zen-img--active');    // fade in
     frontImg.classList.remove('zen-img--active'); // fade out
     zenState.frontIsA = !zenState.frontIsA;
     zenState.index    = nextIndex;
-    document.getElementById('zen-backdrop').src = photo.image_src;
+    document.getElementById('zen-backdrop').src = photo.raw_src;
     console.log('[HK Vision] zenAdvance: backdrop updated');
 
     // Preload the one after next while this fade is running
     var afterNext = (nextIndex + 1) % len;
     var preload   = new Image();
-    preload.src   = state.currentPhotos[afterNext].image_src;
+    preload.src   = state.currentPhotos[afterNext].raw_src;
     console.log('[HK Vision] zenAdvance: preloading index', afterNext, '-', preload.src);
   };
   backImg.onerror = function() {
-    console.error('[HK Vision] zenAdvance: image FAILED to load, advancing index anyway -', photo.image_src);
+    console.error('[HK Vision] zenAdvance: image FAILED to load, advancing index anyway -', photo.raw_src);
     zenState.index = nextIndex;
   };
-  backImg.src = photo.image_src;
+  backImg.src = photo.raw_src;
   backImg.alt = photo.title;
-  console.log('[HK Vision] zenAdvance: loading back-slot image -', photo.image_src);
+  console.log('[HK Vision] zenAdvance: loading back-slot image -', photo.raw_src);
 }
 
 function closeZen() {
