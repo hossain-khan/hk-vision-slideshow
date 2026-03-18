@@ -351,10 +351,6 @@ body {
 }
 
 /* Slideshow Image Loading */
-.slideshow-content {
-  position: relative;
-}
-
 #slideshow-img.loading {
   opacity: 0.5;
 }
@@ -867,8 +863,17 @@ body.slideshow-open {
 }
 
 .zen-fullscreen-btn.hidden {
-  opacity: 0;
+  animation: zenButtonHide var(--duration-slow) var(--ease-out-quart) forwards;
   pointer-events: none;
+}
+
+@keyframes zenButtonHide {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
