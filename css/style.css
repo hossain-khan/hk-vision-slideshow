@@ -780,53 +780,89 @@ body.slideshow-open {
 
 .zen-hint {
   position: absolute;
-  bottom: 2rem;
+  bottom: 3rem;
   left: 50%;
   transform: translateX(-50%);
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.9);
   font-family: var(--font-body);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   pointer-events: none;
   white-space: nowrap;
+  opacity: 0;
   transition: opacity var(--duration-slow) var(--ease-out-quart);
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  border: 1px solid rgba(212, 165, 116, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.zen-overlay.visible .zen-hint {
+  animation: zenHintFadeIn var(--duration-slow) var(--ease-out-quart) forwards;
+}
+
+@keyframes zenHintFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .zen-hint kbd {
   font-family: var(--font-body);
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 3px;
-  padding: 0.125em 0.375em;
-  font-weight: 500;
+  background: rgba(212, 165, 116, 0.15);
+  border: 1px solid rgba(212, 165, 116, 0.4);
+  border-radius: 4px;
+  padding: 0.25em 0.5em;
+  font-weight: 600;
+  color: var(--accent);
 }
 
 .zen-hint.fade-out {
-  opacity: 0;
+  opacity: 0.25;
 }
 
 .zen-fullscreen-btn {
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.55);
-  border-radius: 3px;
-  padding: 0 0.4em;
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(212, 165, 116, 0.4);
+  color: rgba(212, 165, 116, 0.8);
+  border-radius: 4px;
+  padding: 0.5em 0.8em;
   font-family: var(--font-body);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;
-  transition: color var(--duration-quick) var(--ease-out-quart), 
-              border-color var(--duration-quick) var(--ease-out-quart);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-out-quart),
+              color var(--duration-quick) var(--ease-out-quart), 
+              border-color var(--duration-quick) var(--ease-out-quart),
+              background var(--duration-quick) var(--ease-out-quart);
+}
+
+.zen-overlay.visible .zen-fullscreen-btn {
+  animation: zenHintFadeIn var(--duration-slow) var(--ease-out-quart) forwards;
 }
 
 .zen-fullscreen-btn:hover {
-  color: rgba(255, 255, 255, 0.9);
-  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+  border-color: rgba(212, 165, 116, 0.8);
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .zen-fullscreen-btn:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline: 2px solid rgba(212, 165, 116, 0.8);
   outline-offset: 2px;
 }
 
