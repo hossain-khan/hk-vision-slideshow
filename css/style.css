@@ -866,6 +866,11 @@ body.slideshow-open {
   outline-offset: 2px;
 }
 
+.zen-fullscreen-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
    Accessibility: Respect user's motion preferences
    ────────────────────────────────────────────────────────────────────────── */

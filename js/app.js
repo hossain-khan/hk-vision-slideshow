@@ -22,6 +22,7 @@ const zenState = {
   frontIsA: true,  // true = img-a is visible, false = img-b is visible
   timer: null,
   hintTimer: null,
+  buttonHideTimer: null,  // timer for auto-hiding fullscreen button
 };
 
 // --- Data Fetching ---
@@ -413,6 +414,17 @@ function openZen(startIndex) {
     preload.src = state.currentPhotos[nextIdx].raw_src;
     console.log('[HK Vision] openZen: preloading next image (index ' + nextIdx + ') -', preload.src);
   }
+
+  // Auto-hide fullscreen button after 3 seconds, show on mouse move
+  zenShowButton();
+  zenState.buttonHideTimer = setTimeout(function() {
+    zenHideButton();
+    console.log('[HK Vision] openZen: fullscreen button auto-hidden after 3s');
+  }, 3000);
+
+  // Show button on mouse move
+  zen.addEventListener('mousemove', zenOnMouseMove);
+  console.log('[HK Vision] openZen: added mousemove listener for button reveal');
 }
 
 function zenAdvance() {
@@ -496,12 +508,16 @@ function closeZen() {
   zenState.timer = null;
   clearTimeout(zenState.hintTimer);
   zenState.hintTimer = null;
+  clearTimeout(zenState.buttonHideTimer);
+  zenState.buttonHideTimer = null;
+  
   if (isFullscreen()) {
     console.log('[HK Vision] closeZen: also exiting fullscreen');
     exitFullscreen();
   }
 
   var zen = document.getElementById('zen');
+  zen.removeEventListener('mousemove', zenOnMouseMove);
   zen.classList.remove('visible');
   // Wait for overlay fade-out transition before hiding
   setTimeout(function() {
@@ -513,6 +529,37 @@ function closeZen() {
   }, 650); // slightly longer than CSS 0.6s transition
 
   document.body.classList.remove('slideshow-open');
+}
+
+// --- Zen Button Auto-Hide Helpers ---
+
+function zenShowButton() {
+  var btn = document.getElementById('zen-fullscreen-btn');
+  btn.classList.remove('hidden');
+}
+
+function zenHideButton() {
+  var btn = document.getElementById('zen-fullscreen-btn');
+  btn.classList.add('hidden');
+}
+
+function zenOnMouseMove() {
+  if (!zenState.active) return;
+  
+  // Clear existing hide timer if any
+  if (zenState.buttonHideTimer !== null) {
+    clearTimeout(zenState.buttonHideTimer);
+  }
+  
+  // Show the button
+  zenShowButton();
+  console.log('[HK Vision] zenOnMouseMove: button revealed');
+  
+  // Reset the auto-hide timer
+  zenState.buttonHideTimer = setTimeout(function() {
+    zenHideButton();
+    console.log('[HK Vision] zenOnMouseMove: button auto-hidden after inactivity');
+  }, 3000);
 }
 
 // --- Event Listeners (set up after DOM ready via defer) ---
