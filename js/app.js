@@ -1,7 +1,7 @@
 const API_URL = 'https://vision.hossainkhan.com/photos.json';
 const AUTOPLAY_INTERVAL = 5000;
 const ZEN_INTERVAL = 60000;  // 1 minute per image
-const ZEN_FADE_MS  = 2500;   // must match CSS transition on .zen-img
+const ZEN_FADE_MS  = 1200;   // must match CSS transition on .zen-img (1.2s)
 
 console.log('[HK Vision] App initializing. API_URL:', API_URL);
 
